@@ -30,7 +30,7 @@ for i in range(0, NLines):
     Pesee[i]=sh.cell_value(rowx=i, colx=1)
 
 TempH = Temps/60
-Mpap = 0.0089        #paper mass in g
+Mpap = 0.0089        #paper/substrate mass in g
 
 DM = (abs(Pesee-Mpap)/Mpap)*100
 me = Pesee-Mpap      #Water Mass at t in g
@@ -63,10 +63,9 @@ xi = Newton(f, 0, yA0, yAinf)[0]
 T, p, R, Mw, Mas = 298.15, 101325, 8.31446, 18e-3, 29e-3
 rho_w_L = _Liquid(T = T, P=0.101325)['rho']
 beta_w_L = rho_w_L*R*T/(Mw*p)
-Sigma = 8e-3*7e-3      # Paper area
+Sigma = 8e-3*7e-3      # Paper/substrate area
 print ("Paper area : Sigma = {0:1.3e} m^2".format(Sigma))
 def YAInf(z, s0, t):
-    #return (1-erf(z/(4*D0*t)**0.5-xi))/(1+erf(xi))
     return YAf((z-s0)/(4*D0*t)**0.5, xi)
 L, s0 = 3.45e-3, (539.29e-6)/1
 tau = L**2/D0
@@ -80,15 +79,14 @@ dx, dt = 1.0/Nx, tf/Nt
 alpha = dt/dx**2.0
 print("alpha = {0:1.3e}".format(alpha))
 # Solutions vector
-v = np.zeros([Nx+1, Nt+1]) # Vec. colonne solution chgt de variable
+v = np.zeros([Nx+1, Nt+1])
 x = np.linspace(0, 1, Nx +1)
 t = np.linspace(0, tf, Nt +1)
-yA = np.zeros([Nx+1, Nt+1]) # Vec. colonne solution reelle (fraction molaire)
-yAQS = np.zeros([Nx+1, Nt+1]) # Vec. colonne solution quasi-stationnaire (fraction molaire)
-s = np.zeros([Nt+1]) # Front d'evaporation
-s_rec = np.zeros([Nt+1]) # Front d'evaporation reconstruit
+yA = np.zeros([Nx+1, Nt+1])
+yAQS = np.zeros([Nx+1, Nt+1])
+s = np.zeros([Nt+1]) # Evaporation Front
 ds_dt = np.zeros([Nt+1]) # ds/dt
-v_mol = np.zeros_like(s) # vitesse molaire moyenne dans la phase gazeuse
+v_mol = np.zeros_like(s) # Average molar speed in gas phase
 # drying rate pe
 pe = -(p0*Mw*D0)*np.log((1-yAinf)/(1-yA0))/(R*T*rho_w_L*(L-s0))
 # SA
@@ -99,7 +97,7 @@ Lc = L-s0
 s_AQS = s0 - Lc*((1-2*pe*t/Lc)**0.5 - 1.0)
 s_AQS[s_AQS < 0] = 0
 # CLs and CIs
-v[1:,0] = yAinf; v[0,:] = yA0 ; v[-1,:] = yAinf; s[0] = s0; s_rec[0] = s0
+v[1:,0] = yAinf; v[0,:] = yA0 ; v[-1,:] = yAinf; s[0] = s0
 CL = np.zeros([Nx-1])
 
 # some functions
@@ -115,7 +113,6 @@ for n in tqdm(range(1, Nt+1), desc = 'Main Loop'):
         s[n] = 0
     dsSdt = (s[n] - s[n-1])/dt
     ds_dt[n] = dsSdt
-    s_rec[n] = s_rec[n-1] + dsSdt*dt
     v_mol[n] = -beta_w_L*dsSdt
     # ABC matrix
     ABC = np.zeros([Nx-1,Nx-1])
