@@ -5,9 +5,8 @@ This repository contains numerical code for simulating the drying of a thin aque
 ## 🔍 Description
 
 - Implicit finite difference scheme
-- Newton-Raphson iteration for nonlinearity
-- Time-dependent domain evolution
-- Reproducible examples
+- Time-dependent domain evolution and Boundary Immobilization Method (BIM)
+- Comparison with experimental Data
 
 ## 📦 Dependencies
 
@@ -27,7 +26,7 @@ pip install -r requirements.txt
 ## ▶️ Usage
 
 ```bash
-python run_simulation.py
+python PureW_Drying_Model_RH0_1a.py
 ```
 
 ## 📁 Folder Structure
@@ -43,7 +42,7 @@ python run_simulation.py
 To reproduce the main results of the publication, run:
 
 ```bash
-python examples/reproduce_main_figure.py
+python src/PureW_Drying_Model_RH0_1a.py
 ```
 
 ## 📜 License
